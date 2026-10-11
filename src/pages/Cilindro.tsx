@@ -1,3 +1,6 @@
+import SceneViewer from '../components/SceneViewer';
+import Cilindro3D from '../components/Cilindro3D';
+
 const Cilindro = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -12,39 +15,34 @@ const Cilindro = () => {
         </p>
       </div>
 
-      {/* Visual Representation */}
+      {/* Visual 3D Interativo */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">🎨 Representação Visual</h2>
-        <div className="flex justify-center">
-          <svg viewBox="0 0 400 350" className="w-full max-w-lg">
-            {/* Body of cylinder */}
-            <rect x="120" y="80" width="160" height="200" fill="#c084fc" stroke="#6b21a8" strokeWidth="2" opacity="0.6" />
-            {/* Left edge */}
-            <line x1="120" y1="80" x2="120" y2="280" stroke="#6b21a8" strokeWidth="2" />
-            {/* Right edge */}
-            <line x1="280" y1="80" x2="280" y2="280" stroke="#6b21a8" strokeWidth="2" />
-            {/* Bottom ellipse */}
-            <ellipse cx="200" cy="280" rx="80" ry="25" fill="#a855f7" stroke="#6b21a8" strokeWidth="2" opacity="0.8" />
-            {/* Top ellipse */}
-            <ellipse cx="200" cy="80" rx="80" ry="25" fill="#d8b4fe" stroke="#6b21a8" strokeWidth="2" opacity="0.9" />
-
-            {/* Radius line */}
-            <line x1="200" y1="80" x2="280" y2="80" stroke="#dc2626" strokeWidth="2" strokeDasharray="5,5" />
-            <text x="240" y="72" textAnchor="middle" fill="#dc2626" fontWeight="bold" fontSize="12">r (raio)</text>
-
-            {/* Height line */}
-            <line x1="310" y1="80" x2="310" y2="280" stroke="#16a34a" strokeWidth="2" />
-            <line x1="305" y1="80" x2="315" y2="80" stroke="#16a34a" strokeWidth="2" />
-            <line x1="305" y1="280" x2="315" y2="280" stroke="#16a34a" strokeWidth="2" />
-            <text x="330" y="185" textAnchor="middle" fill="#16a34a" fontWeight="bold" fontSize="12">h (altura)</text>
-
-            {/* Center dot */}
-            <circle cx="200" cy="80" r="3" fill="#dc2626" />
-          </svg>
-        </div>
-        <p className="text-center text-gray-500 mt-4">
-          O cilindro tem duas bases circulares (elipses na vista) e uma superfície lateral curva
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">🎮 Modelo 3D Interativo</h2>
+        <p className="text-center text-gray-600 mb-4">
+          Arraste para rotacionar • Use o scroll para zoom • Observe o raio, altura e as bases circulares
         </p>
+        <div className="relative">
+          <SceneViewer cameraPosition={[4, 3, 5]}>
+            <Cilindro3D />
+          </SceneViewer>
+        </div>
+        <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-yellow-500 rounded-full"></span> Centros das bases
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-red-500 rounded-full"></span> Raio (r)
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-purple-400 rounded-full opacity-50"></span> Superfície lateral
+          </span>
+        </div>
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+          <p className="text-amber-800 text-sm">
+            ⚠️ O cilindro <strong>NÃO tem vértices</strong> (cantos) porque suas superfícies são curvas!
+            Ele tem apenas <strong>2 arestas curvas</strong> (os contornos das bases) e <strong>3 faces</strong>.
+          </p>
+        </div>
       </div>
 
       {/* Properties */}

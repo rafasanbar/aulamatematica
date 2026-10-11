@@ -1,3 +1,6 @@
+import SceneViewer from '../components/SceneViewer';
+import PrismaTriangular3D from '../components/PrismaTriangular3D';
+
 const PrismaTriangular = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -12,39 +15,28 @@ const PrismaTriangular = () => {
         </p>
       </div>
 
-      {/* Visual Representation */}
+      {/* Visual 3D Interativo */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">🎨 Representação Visual</h2>
-        <div className="flex justify-center">
-          <svg viewBox="0 0 400 300" className="w-full max-w-lg">
-            {/* Back triangle */}
-            <polygon points="200,60 100,200 300,200" fill="#86efac" stroke="#166534" strokeWidth="2" opacity="0.4" />
-            {/* Left rectangular face */}
-            <polygon points="160,90 60,230 100,200 200,60" fill="#4ade80" stroke="#166534" strokeWidth="2" opacity="0.6" />
-            {/* Right rectangular face */}
-            <polygon points="240,90 340,230 300,200 200,60" fill="#22c55e" stroke="#166534" strokeWidth="2" opacity="0.7" />
-            {/* Bottom rectangular face */}
-            <polygon points="60,230 340,230 300,200 100,200" fill="#16a34a" stroke="#166534" strokeWidth="2" opacity="0.5" />
-            {/* Front triangle */}
-            <polygon points="160,90 60,230 260,230" fill="#86efac" stroke="#166534" strokeWidth="2" opacity="0.8" />
-
-            {/* Vertices */}
-            <circle cx="160" cy="90" r="5" fill="#dc2626" />
-            <circle cx="60" cy="230" r="5" fill="#dc2626" />
-            <circle cx="260" cy="230" r="5" fill="#dc2626" />
-            <circle cx="200" cy="60" r="5" fill="#dc2626" />
-            <circle cx="100" cy="200" r="5" fill="#dc2626" />
-            <circle cx="300" cy="200" r="5" fill="#dc2626" />
-
-            {/* Labels */}
-            <text x="160" y="250" textAnchor="middle" fill="#166534" fontWeight="bold" fontSize="12">Base (triângulo)</text>
-            <text x="320" y="150" textAnchor="middle" fill="#166534" fontWeight="bold" fontSize="12" transform="rotate(-60, 320, 150)">h (altura)</text>
-          </svg>
-        </div>
-        <p className="text-center text-gray-500 mt-4">
-          <span className="inline-block w-3 h-3 bg-red-600 rounded-full mr-2"></span>
-          Os pontos vermelhos são os <strong>vértices</strong> (cantos da figura)
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">🎮 Modelo 3D Interativo</h2>
+        <p className="text-center text-gray-600 mb-4">
+          Arraste para rotacionar • Use o scroll para zoom • Observe as bases triangulares e faces retangulares
         </p>
+        <div className="relative">
+          <SceneViewer cameraPosition={[4, 3, 5]}>
+            <PrismaTriangular3D />
+          </SceneViewer>
+        </div>
+        <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-red-500 rounded-full"></span> Vértices (6)
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-green-800 rounded-full"></span> Arestas (9)
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-green-400 rounded-full opacity-50"></span> Faces (5)
+          </span>
+        </div>
       </div>
 
       {/* Properties */}

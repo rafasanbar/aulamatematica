@@ -1,3 +1,6 @@
+import SceneViewer from '../components/SceneViewer';
+import Paralelepipedo3D from '../components/Paralelepipedo3D';
+
 const Paralelepipedo = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -13,44 +16,28 @@ const Paralelepipedo = () => {
         </p>
       </div>
 
-      {/* Visual Representation */}
+      {/* Visual 3D Interativo */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">🎨 Representação Visual</h2>
-        <div className="flex justify-center">
-          <svg viewBox="0 0 400 300" className="w-full max-w-lg">
-            {/* Back face */}
-            <polygon points="120,80 320,80 320,220 120,220" fill="#93c5fd" stroke="#1e40af" strokeWidth="2" opacity="0.5" />
-            {/* Bottom face */}
-            <polygon points="80,120 280,120 320,220 120,220" fill="#60a5fa" stroke="#1e40af" strokeWidth="2" opacity="0.7" />
-            {/* Left face */}
-            <polygon points="80,120 120,80 120,220 80,260" fill="#3b82f6" stroke="#1e40af" strokeWidth="2" opacity="0.6" />
-            {/* Front face */}
-            <polygon points="80,120 280,120 280,260 80,260" fill="#93c5fd" stroke="#1e40af" strokeWidth="2" opacity="0.8" />
-            {/* Top face */}
-            <polygon points="80,120 120,80 320,80 280,120" fill="#bfdbfe" stroke="#1e40af" strokeWidth="2" opacity="0.9" />
-            {/* Right face */}
-            <polygon points="280,120 320,80 320,220 280,260" fill="#60a5fa" stroke="#1e40af" strokeWidth="2" opacity="0.7" />
-
-            {/* Vertices */}
-            <circle cx="80" cy="120" r="5" fill="#dc2626" />
-            <circle cx="280" cy="120" r="5" fill="#dc2626" />
-            <circle cx="80" cy="260" r="5" fill="#dc2626" />
-            <circle cx="280" cy="260" r="5" fill="#dc2626" />
-            <circle cx="120" cy="80" r="5" fill="#dc2626" />
-            <circle cx="320" cy="80" r="5" fill="#dc2626" />
-            <circle cx="120" cy="220" r="5" fill="#dc2626" />
-            <circle cx="320" cy="220" r="5" fill="#dc2626" />
-
-            {/* Labels */}
-            <text x="180" y="195" textAnchor="middle" className="text-sm" fill="#1e40af" fontWeight="bold">Largura (a)</text>
-            <text x="300" y="160" textAnchor="middle" className="text-sm" fill="#1e40af" fontWeight="bold" transform="rotate(-70, 300, 160)">Altura (c)</text>
-            <text x="100" y="105" textAnchor="middle" className="text-sm" fill="#1e40af" fontWeight="bold" transform="rotate(-30, 100, 105)">Prof. (b)</text>
-          </svg>
-        </div>
-        <p className="text-center text-gray-500 mt-4">
-          <span className="inline-block w-3 h-3 bg-red-600 rounded-full mr-2"></span>
-          Os pontos vermelhos são os <strong>vértices</strong> (cantos da figura)
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">🎮 Modelo 3D Interativo</h2>
+        <p className="text-center text-gray-600 mb-4">
+          Arraste para rotacionar • Use o scroll para zoom • Observe os vértices (pontos vermelhos) e as dimensões
         </p>
+        <div className="relative">
+          <SceneViewer cameraPosition={[5, 3.5, 5]}>
+            <Paralelepipedo3D />
+          </SceneViewer>
+        </div>
+        <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-red-500 rounded-full"></span> Vértices (8)
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-blue-800 rounded-full"></span> Arestas (12)
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-blue-400 rounded-full opacity-50"></span> Faces (6)
+          </span>
+        </div>
       </div>
 
       {/* Properties */}

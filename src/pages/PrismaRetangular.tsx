@@ -1,3 +1,6 @@
+import SceneViewer from '../components/SceneViewer';
+import PrismaRetangular3D from '../components/PrismaRetangular3D';
+
 const PrismaRetangular = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -12,44 +15,28 @@ const PrismaRetangular = () => {
         </p>
       </div>
 
-      {/* Visual Representation */}
+      {/* Visual 3D Interativo */}
       <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">🎨 Representação Visual</h2>
-        <div className="flex justify-center">
-          <svg viewBox="0 0 400 300" className="w-full max-w-lg">
-            {/* Back face */}
-            <polygon points="140,60 340,60 340,200 140,200" fill="#fdba74" stroke="#9a3412" strokeWidth="2" opacity="0.4" />
-            {/* Bottom face */}
-            <polygon points="100,100 300,100 340,200 140,200" fill="#fb923c" stroke="#9a3412" strokeWidth="2" opacity="0.5" />
-            {/* Left face */}
-            <polygon points="100,100 140,60 140,200 100,240" fill="#f97316" stroke="#9a3412" strokeWidth="2" opacity="0.7" />
-            {/* Front face */}
-            <polygon points="100,100 300,100 300,240 100,240" fill="#fdba74" stroke="#9a3412" strokeWidth="2" opacity="0.8" />
-            {/* Top face */}
-            <polygon points="100,100 140,60 340,60 300,100" fill="#fed7aa" stroke="#9a3412" strokeWidth="2" opacity="0.9" />
-            {/* Right face */}
-            <polygon points="300,100 340,60 340,200 300,240" fill="#fb923c" stroke="#9a3412" strokeWidth="2" opacity="0.7" />
-
-            {/* Vertices */}
-            <circle cx="100" cy="100" r="5" fill="#dc2626" />
-            <circle cx="300" cy="100" r="5" fill="#dc2626" />
-            <circle cx="100" cy="240" r="5" fill="#dc2626" />
-            <circle cx="300" cy="240" r="5" fill="#dc2626" />
-            <circle cx="140" cy="60" r="5" fill="#dc2626" />
-            <circle cx="340" cy="60" r="5" fill="#dc2626" />
-            <circle cx="140" cy="200" r="5" fill="#dc2626" />
-            <circle cx="340" cy="200" r="5" fill="#dc2626" />
-
-            {/* Labels */}
-            <text x="200" y="180" textAnchor="middle" fill="#9a3412" fontWeight="bold" fontSize="12">Largura (l)</text>
-            <text x="200" y="260" textAnchor="middle" fill="#9a3412" fontWeight="bold" fontSize="12">Comprimento (c)</text>
-            <text x="330" y="140" textAnchor="middle" fill="#9a3412" fontWeight="bold" fontSize="12" transform="rotate(-75, 330, 140)">Altura (h)</text>
-          </svg>
-        </div>
-        <p className="text-center text-gray-500 mt-4">
-          <span className="inline-block w-3 h-3 bg-red-600 rounded-full mr-2"></span>
-          Os pontos vermelhos são os <strong>vértices</strong> (cantos da figura)
+        <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">🎮 Modelo 3D Interativo</h2>
+        <p className="text-center text-gray-600 mb-4">
+          Arraste para rotacionar • Use o scroll para zoom • Observe as dimensões e os vértices
         </p>
+        <div className="relative">
+          <SceneViewer cameraPosition={[5, 3.5, 5]}>
+            <PrismaRetangular3D />
+          </SceneViewer>
+        </div>
+        <div className="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-red-500 rounded-full"></span> Vértices (8)
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-orange-800 rounded-full"></span> Arestas (12)
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-orange-400 rounded-full opacity-50"></span> Faces (6)
+          </span>
+        </div>
       </div>
 
       {/* Properties */}
