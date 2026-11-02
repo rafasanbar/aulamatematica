@@ -22,6 +22,12 @@ com dicas graduais e resolução comentada.
 | 6 | Polinômios e inteiros: restos, primos, $p(n)$ múltiplo de $m$ | Q12 |
 | Topo | ITA 2027 Q10 (resp. E, $-15$) e Q12 (resp. B, $600$) | — |
 
-Cada degrau tem: ideia central, exemplo resolvido, pegadinha, treino com gabarito
+**Versão em slides:** [`aula-polinomios-ita.pptx`](aula-polinomios-ita.pptx) (53 slides, PowerPoint).
+Traz a teoria de cada degrau, uma **lista extra de 4 exercícios por degrau** (★ fixação,
+★★ aplicação, ★★★ nível ITA) com **gabarito comentado** em um slide por exercício, e a
+resolução das Questões 10 e 12 em etapas. As notas do apresentador trazem dicas para conduzir
+a aula.
+
+Na página HTML, cada degrau tem: ideia central, exemplo resolvido, pegadinha, treino com gabarito
 escondido e checkpoint (o progresso fica salvo no navegador do aluno). No fim há um
 roteiro sugerido de 3 encontros de 100 minutos para o professor.
