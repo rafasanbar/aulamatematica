@@ -1,0 +1,933 @@
+<title>Escada dos Polinômios</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: papel quadriculado de prancheta técnica; uma coluna de leitura, escada como mapa no topo, faixa escura para o topo (ITA). */
+:root {
+  --paper: #F5F7FB;
+  --grid: rgba(39, 71, 214, 0.055);
+  --ink: #16203A;
+  --muted: #56617B;
+  --rule: #D4DAE6;
+  --card: #FFFFFF;
+  --accent: #2545D3;
+  --accent-soft: #E6EBFD;
+  --warn: #93460A;
+  --warn-soft: #FCF0E1;
+  --ok: #1D7549;
+  --ok-soft: #E2F3E9;
+  --phys: #6B3FA0;
+  --phys-soft: #F1EAFA;
+  --band: #14203F;
+  --band-ink: #EEF2FF;
+  --band-muted: #A9B5D6;
+  --band-card: #1C2A50;
+  --band-rule: #2E3D69;
+  --band-accent: #FFC861;
+
+  --f-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0F1424; --grid: rgba(142, 166, 255, 0.06); --ink: #E4E8F2; --muted: #9AA4BD;
+    --rule: #29324D; --card: #151C30; --accent: #93A9FF; --accent-soft: #1C2649;
+    --warn: #F3B574; --warn-soft: #2D2013; --ok: #72D3A2; --ok-soft: #12291E;
+    --phys: #C9A8F2; --phys-soft: #241A35;
+    --band: #18244A; --band-ink: #EEF2FF; --band-muted: #A9B5D6; --band-card: #22305B; --band-rule: #34447A; --band-accent: #FFC861;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0F1424; --grid: rgba(142, 166, 255, 0.06); --ink: #E4E8F2; --muted: #9AA4BD;
+  --rule: #29324D; --card: #151C30; --accent: #93A9FF; --accent-soft: #1C2649;
+  --warn: #F3B574; --warn-soft: #2D2013; --ok: #72D3A2; --ok-soft: #12291E;
+  --phys: #C9A8F2; --phys-soft: #241A35;
+  --band: #18244A; --band-ink: #EEF2FF; --band-muted: #A9B5D6; --band-card: #22305B; --band-rule: #34447A; --band-accent: #FFC861;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body {
+  margin: 0;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.6;
+}
+.wrap {
+  max-width: 820px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2.1rem, 6vw, 3.4rem); font-weight: 800; font-stretch: 112%; letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.55rem, 4vw, 2.1rem); font-weight: 750; font-stretch: 108%; }
+h3 { font-size: 1.12rem; font-weight: 700; font-stretch: 104%; }
+p { margin: 0; }
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.eyebrow {
+  font-family: var(--f-mono); font-size: 0.78rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent);
+}
+.muted { color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* Cabeçalho */
+header.hero { padding-block: 48px 28px; }
+header.hero .stack { gap: 16px; }
+.lede { font-size: 1.15rem; max-width: 62ch; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button.btn {
+  font: 700 0.9rem var(--f-body); color: var(--accent); background: var(--card);
+  border: 1.5px solid var(--accent); border-radius: 999px; padding: 7px 16px; cursor: pointer;
+}
+button.btn:hover { background: var(--accent-soft); }
+.progress-text { font-family: var(--f-mono); font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* A escada */
+.ladder {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px;
+  align-items: end; margin-top: 8px; padding: 18px 14px 14px;
+  background: var(--card); border: 1px solid var(--rule); border-radius: 10px;
+}
+.rung {
+  display: flex; flex-direction: column; justify-content: flex-end; gap: 4px;
+  text-decoration: none; color: var(--ink); min-width: 0;
+}
+.rung .block {
+  border: 1.5px solid var(--accent); background: var(--accent-soft); border-radius: 4px 4px 0 0;
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 6px;
+  font-family: var(--f-mono); font-weight: 700; color: var(--accent); font-size: 0.95rem;
+  transition: background .2s;
+}
+.rung .lbl { font-size: 0.78rem; text-align: center; line-height: 1.2; overflow-wrap: anywhere; }
+.rung.done .block { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.rung.done .block::after { content: " ✓"; }
+.rung.top .block { background: var(--band); border-color: var(--band); color: var(--band-accent); }
+.rung.top.done .block { color: var(--ok); }
+.rung:hover .lbl { text-decoration: underline; }
+.rung:nth-child(1) .block { height: 34px; } .rung:nth-child(2) .block { height: 52px; }
+.rung:nth-child(3) .block { height: 70px; } .rung:nth-child(4) .block { height: 88px; }
+.rung:nth-child(5) .block { height: 106px; } .rung:nth-child(6) .block { height: 124px; }
+.rung:nth-child(7) .block { height: 146px; }
+@media (max-width: 560px) {
+  .ladder { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 6px; }
+  .rung { display: grid; grid-template-columns: var(--w) minmax(0, 1fr); align-items: center; gap: 10px; }
+  .rung .block { height: 32px !important; border-radius: 4px; align-items: center; padding-top: 0; }
+  .rung .lbl { text-align: left; }
+  .rung:nth-child(1) { --w: 22%; } .rung:nth-child(2) { --w: 31%; } .rung:nth-child(3) { --w: 40%; }
+  .rung:nth-child(4) { --w: 49%; } .rung:nth-child(5) { --w: 58%; } .rung:nth-child(6) { --w: 67%; }
+  .rung:nth-child(7) { --w: 76%; }
+}
+
+/* Seções */
+section.step { padding-block: 44px; border-top: 1px solid var(--rule); }
+section.step > .wrap { display: flex; flex-direction: column; gap: 20px; }
+.step-head { display: flex; flex-direction: column; gap: 6px; }
+.goal { color: var(--muted); }
+
+.box { border-radius: 8px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.box > .tag { font-family: var(--f-mono); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ideia { background: var(--card); border: 1.5px solid var(--accent); }
+.ideia > .tag { color: var(--accent); }
+.exemplo { background: var(--card); border: 1px solid var(--rule); }
+.exemplo > .tag { color: var(--muted); }
+.pegadinha { background: var(--warn-soft); }
+.pegadinha > .tag { color: var(--warn); }
+.fisica { background: var(--phys-soft); }
+.fisica > .tag { color: var(--phys); }
+.box ul, .box ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
+.formula { overflow-x: auto; padding-block: 4px; }
+
+.treino { display: flex; flex-direction: column; gap: 12px; }
+.treino h3 { display: flex; gap: 10px; align-items: baseline; }
+.ex { background: var(--card); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.ex .num { font-family: var(--f-mono); font-weight: 700; color: var(--accent); font-size: 0.85rem; }
+.lvl { font-family: var(--f-mono); font-size: 0.72rem; color: var(--muted); }
+
+details { border-top: 1px dashed var(--rule); padding-top: 8px; }
+details > summary {
+  cursor: pointer; font-weight: 700; color: var(--accent); list-style: none; display: inline-flex; gap: 6px; align-items: center;
+}
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; transition: transform .15s; display: inline-block; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > .ans { padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+
+.check {
+  display: flex; gap: 12px; align-items: flex-start; background: var(--ok-soft); border-radius: 8px; padding: 14px 16px;
+}
+.check input { width: 22px; height: 22px; accent-color: var(--ok); margin-top: 2px; flex: none; }
+.check label { cursor: pointer; }
+.check strong { color: var(--ok); }
+
+table.briot { border-collapse: collapse; font-family: var(--f-mono); font-variant-numeric: tabular-nums; margin: 4px 0; }
+table.briot td { padding: 6px 14px; text-align: center; }
+table.briot td.root { border-right: 2px solid var(--ink); }
+table.briot tr:first-child td { border-bottom: 2px solid var(--ink); }
+table.briot td.rest { color: var(--accent); font-weight: 700; border-left: 1.5px dashed var(--muted); }
+.scroll { overflow-x: auto; }
+
+table.map { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+table.map th, table.map td { border-bottom: 1px solid var(--rule); padding: 8px 10px; text-align: left; vertical-align: top; }
+table.map th { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+table.res { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+table.res th, table.res td { border: 1px solid var(--band-rule); padding: 6px 12px; text-align: center; }
+table.res th { font-family: var(--f-mono); font-size: 0.8rem; color: var(--band-muted); }
+
+/* Topo: faixa escura */
+section.topo { background: var(--band); color: var(--band-ink); padding-block: 52px; }
+section.topo > .wrap { display: flex; flex-direction: column; gap: 24px; }
+section.topo .eyebrow { color: var(--band-accent); }
+section.topo .goal { color: var(--band-muted); }
+section.topo a { color: var(--band-accent); }
+.questao { background: var(--band-card); border: 1px solid var(--band-rule); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.questao .enun { font-size: 1.05rem; }
+.alts { display: flex; flex-wrap: wrap; gap: 8px 22px; font-variant-numeric: tabular-nums; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: 0.75rem; border: 1px solid var(--band-rule); border-radius: 999px; padding: 3px 10px; color: var(--band-muted); text-decoration: none; }
+section.topo details { border-top-color: var(--band-rule); }
+section.topo details > summary { color: var(--band-accent); }
+section.topo .check { background: rgba(114, 211, 162, 0.12); }
+section.topo .check strong { color: #8FE0B7; }
+.answer-pill { display: inline-block; font-family: var(--f-mono); font-weight: 700; background: var(--band-accent); color: #1A1A1A; border-radius: 6px; padding: 2px 10px; }
+.licao { border-left: 3px solid var(--band-accent); padding-left: 14px; }
+.steps { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; }
+
+footer.prof { padding-block: 44px 64px; border-top: 1px solid var(--rule); }
+footer.prof .wrap { display: flex; flex-direction: column; gap: 16px; }
+.plan { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.plan > div { background: var(--card); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+@media (max-width: 680px) { .plan { grid-template-columns: 1fr; } }
+
+mjx-container { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+mjx-container[display="true"] { margin: 6px 0 !important; padding-block: 2px; }
+</style>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+
+<header class="hero">
+  <div class="wrap stack">
+    <span class="eyebrow">Matemática · Pré-ITA · Polinômios</span>
+    <h1>Escada dos Polinômios</h1>
+    <p class="lede">Seis degraus que levam do “o que é grau?” até as duas questões de polinômios da 1ª fase do <strong>ITA 2027</strong> (Questões 10 e 12). Cada degrau usa só o que veio antes. Suba um de cada vez.</p>
+    <div class="box exemplo">
+      <span class="tag">Como usar cada degrau</span>
+      <ol>
+        <li><strong>Ideia central</strong>: leia e tente explicar com suas palavras.</li>
+        <li><strong>Exemplo resolvido</strong>: refaça no caderno antes de ler a solução.</li>
+        <li><strong>Pegadinha</strong>: o erro que mais derruba candidato.</li>
+        <li><strong>Treino</strong>: resolva sem abrir a resposta. Só confira no final.</li>
+        <li><strong>Checkpoint</strong>: marque quando resolver o treino sozinho. Aí suba.</li>
+      </ol>
+    </div>
+    <nav class="ladder" aria-label="Degraus da escada">
+      <a class="rung" href="#degrau-1" data-k="1"><span class="block">1</span><span class="lbl">Linguagem</span></a>
+      <a class="rung" href="#degrau-2" data-k="2"><span class="block">2</span><span class="lbl">Divisão e resto</span></a>
+      <a class="rung" href="#degrau-3" data-k="3"><span class="block">3</span><span class="lbl">Raízes</span></a>
+      <a class="rung" href="#degrau-4" data-k="4"><span class="block">4</span><span class="lbl">Girard</span></a>
+      <a class="rung" href="#degrau-5" data-k="5"><span class="block">5</span><span class="lbl">Grau como ferramenta</span></a>
+      <a class="rung" href="#degrau-6" data-k="6"><span class="block">6</span><span class="lbl">Polinômios e inteiros</span></a>
+      <a class="rung top" href="#topo" data-k="topo"><span class="block">ITA</span><span class="lbl">Topo: Q10 e Q12</span></a>
+    </nav>
+    <div class="toolbar">
+      <span class="progress-text" id="progress">0 de 7 degraus concluídos</span>
+      <button class="btn" type="button" id="toggle-all">Abrir todas as respostas</button>
+      <button class="btn" type="button" id="reset">Zerar progresso</button>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Mapa: o que o ITA cobrou</span>
+      <div class="scroll">
+        <table class="map">
+          <thead><tr><th>Questão</th><th>Ferramentas usadas</th><th>Degraus</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Q10</strong></td><td>Raízes complexas conjugadas, grau da composição, cancelamento do termo líder, valor numérico</td><td>1, 3, 5</td></tr>
+            <tr><td><strong>Q12</strong></td><td>Forma fatorada, produto das raízes (Girard), divisores, restos na divisão por 5</td><td>3, 4, 6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ DEGRAU 1 ============ -->
+<section class="step" id="degrau-1">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="eyebrow">Degrau 1 de 6</span>
+      <h2>A linguagem do polinômio</h2>
+      <p class="goal">Meta: ler um polinômio, achar o grau, calcular valores e comparar dois polinômios.</p>
+    </div>
+
+    <div class="box ideia">
+      <span class="tag">Ideia central</span>
+      <p>Um polinômio é uma “máquina” que só sabe <strong>somar e multiplicar</strong> potências de $x$:</p>
+      <div class="formula">$$p(x) = a_n x^n + a_{n-1}x^{n-1} + \dots + a_1 x + a_0, \qquad a_n \neq 0$$</div>
+      <ul>
+        <li><strong>Grau</strong> ($n$): o maior expoente com coeficiente diferente de zero. $a_n$ é o <strong>coeficiente líder</strong>; se $a_n = 1$, o polinômio é <strong>mônico</strong>.</li>
+        <li><strong>Valor numérico</strong>: troque $x$ por um número. Três atalhos que o ITA adora:
+          <ul>
+            <li>$p(0) = a_0$ (termo independente)</li>
+            <li>$p(1) = a_n + \dots + a_1 + a_0$ (soma dos coeficientes)</li>
+            <li>$p(-1)$ = soma alternada dos coeficientes</li>
+          </ul>
+        </li>
+        <li><strong>Identidade</strong>: $p(x) \equiv q(x)$ para todo $x$ se, e somente se, os coeficientes são iguais termo a termo. Isso permite “escolher valores espertos de $x$”.</li>
+      </ul>
+    </div>
+
+    <div class="box fisica">
+      <span class="tag">Conexão com a física</span>
+      <p>A posição no MUV, $s(t) = s_0 + v_0 t + \tfrac{a}{2}t^2$, é um polinômio de grau 2 em $t$. O termo independente $s(0)=s_0$ é a posição inicial. Calcular $s(3)$ é calcular um valor numérico. Uma raiz de $s(t)$ é o instante em que o móvel passa pela origem.</p>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido</span>
+      <p>Determine $a$, $b$ e $c$ tais que $a(x-1)^2 + b(x-1) + c \equiv x^2 + 3x + 1$.</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p><strong>Truque:</strong> escolha $x$ que anula parênteses.</p>
+          <p>$x = 1$: o lado esquerdo vira só $c$, e o direito vale $1 + 3 + 1 = 5$. Logo $c = 5$.</p>
+          <p>Coeficiente de $x^2$: só $a(x-1)^2$ tem $x^2$, então $a = 1$.</p>
+          <p>$x = 0$: $a - b + c = 1 \Rightarrow 1 - b + 5 = 1 \Rightarrow b = 5$.</p>
+          <p>Resposta: $a = 1,\ b = 5,\ c = 5$.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box pegadinha">
+      <span class="tag">Pegadinha</span>
+      <p>Grau que depende de parâmetro. Em $p(x) = (m^2-4)x^3 + (m-2)x^2 + 3x - 1$, para o grau ser 1 é preciso zerar <em>os dois</em> primeiros coeficientes: $m^2 - 4 = 0$ <strong>e</strong> $m - 2 = 0$, então só $m = 2$. Com $m = -2$ sobra $-4x^2$, e o grau é 2.</p>
+    </div>
+
+    <div class="treino">
+      <h3>Treino <span class="lvl">3 exercícios</span></h3>
+      <div class="ex">
+        <span class="num">1.1</span>
+        <p>Seja $p(x) = 2x^3 - x + 5$. Calcule $p(-1)$, a soma dos coeficientes e o termo independente.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>$p(-1) = -2 + 1 + 5 = 4$. Soma dos coeficientes: $p(1) = 2 - 1 + 5 = 6$. Termo independente: $p(0) = 5$.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">1.2</span>
+        <p>Para que valores de $m$ o polinômio $(m^2-4)x^3 + (m-2)x^2 + 3x - 1$ tem grau 2?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Precisamos de $m^2 - 4 = 0$ (some o $x^3$) e $m - 2 \neq 0$ (fica o $x^2$). Então $m = -2$.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">1.3</span>
+        <p>Se $p(x+1) = x^2 + 2x + 3$ para todo $x$, determine $p(x)$.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Chame $u = x + 1$, ou seja, $x = u - 1$:</p>
+          <p>$p(u) = (u-1)^2 + 2(u-1) + 3 = u^2 - 2u + 1 + 2u - 2 + 3 = u^2 + 2$.</p>
+          <p>Logo $p(x) = x^2 + 2$.</p>
+        </div></details>
+      </div>
+    </div>
+
+    <div class="check">
+      <input type="checkbox" id="ck-1" data-k="1">
+      <label for="ck-1"><strong>Checkpoint 1.</strong> Sei achar o grau (inclusive com parâmetro), uso $p(0)$, $p(1)$ e $p(-1)$ como atalhos e comparo coeficientes. Posso subir.</label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEGRAU 2 ============ -->
+<section class="step" id="degrau-2">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="eyebrow">Degrau 2 de 6</span>
+      <h2>Divisão e Teorema do Resto</h2>
+      <p class="goal">Meta: dividir rápido e, principalmente, achar restos <em>sem</em> dividir.</p>
+    </div>
+
+    <div class="box ideia">
+      <span class="tag">Ideia central</span>
+      <p>Igual à divisão de números inteiros ($17 = 5 \cdot 3 + 2$):</p>
+      <div class="formula">$$p(x) = d(x)\cdot q(x) + r(x), \qquad \text{grau}(r) \lt \text{grau}(d)$$</div>
+      <ul>
+        <li><strong>Teorema do Resto:</strong> o resto de $p(x)$ por $(x - a)$ é $p(a)$. Motivo: em $p(x) = (x-a)q(x) + r$, faça $x = a$ e o primeiro termo some.</li>
+        <li><strong>Teorema do Fator:</strong> $p(a) = 0 \iff (x - a)$ divide $p(x)$. Raiz e fator são a mesma informação.</li>
+        <li><strong>Divisor de grau 2:</strong> o resto tem grau no máximo 1, então $r(x) = ax + b$. Substitua as raízes do divisor para achar $a$ e $b$.</li>
+      </ul>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido 1: Briot-Ruffini</span>
+      <p>Divida $p(x) = 2x^3 - 3x^2 + 5$ por $x - 2$.</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p>Escreva <strong>todos</strong> os coeficientes, inclusive o zero do $x$ que falta: $2,\ -3,\ 0,\ 5$.</p>
+          <div class="scroll">
+            <table class="briot" aria-label="Dispositivo de Briot-Ruffini">
+              <tr><td class="root">2</td><td>2</td><td>−3</td><td>0</td><td>5</td></tr>
+              <tr><td class="root"></td><td>2</td><td>1</td><td>2</td><td class="rest">9</td></tr>
+            </table>
+          </div>
+          <p>Baixe o 2. Depois: $2\cdot 2 + (-3) = 1$; $1 \cdot 2 + 0 = 2$; $2 \cdot 2 + 5 = 9$.</p>
+          <p>Quociente $q(x) = 2x^2 + x + 2$ e resto $9$. Conferência pelo Teorema do Resto: $p(2) = 16 - 12 + 5 = 9$. ✓</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido 2: estilo ITA</span>
+      <p>Um polinômio $p$ satisfaz $p(1) = 3$ e $p(2) = 7$. Qual o resto da divisão de $p(x)$ por $(x-1)(x-2)$?</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p>O divisor tem grau 2, então o resto é $ax + b$: $p(x) = (x-1)(x-2)q(x) + ax + b$.</p>
+          <p>$x = 1$: $a + b = 3$. $x = 2$: $2a + b = 7$. Subtraindo: $a = 4$, $b = -1$.</p>
+          <p>Resto: $r(x) = 4x - 1$. Repare que não precisamos conhecer $p$.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box pegadinha">
+      <span class="tag">Pegadinha</span>
+      <p>No Briot-Ruffini, esquecer o <strong>zero</strong> dos termos ausentes. Em $2x^3 - 3x^2 + 5$ falta o termo em $x$; sem o zero, toda a conta desanda.</p>
+    </div>
+
+    <div class="treino">
+      <h3>Treino <span class="lvl">3 exercícios</span></h3>
+      <div class="ex">
+        <span class="num">2.1</span>
+        <p>Qual o resto da divisão de $x^{100} - 3x + 2$ por $x - 1$?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Resto $= p(1) = 1 - 3 + 2 = 0$. Ou seja, $x - 1$ divide esse polinômio.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">2.2</span>
+        <p>Determine $k$ para que $x^3 + kx^2 - 4x + 4$ seja divisível por $x + 2$.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Precisa $p(-2) = 0$: $-8 + 4k + 8 + 4 = 0 \Rightarrow 4k + 4 = 0 \Rightarrow k = -1$.</p>
+          <p>Bônus: $x^3 - x^2 - 4x + 4 = (x-1)(x-2)(x+2)$.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">2.3</span>
+        <p>Qual o resto da divisão de $x^{100}$ por $x^2 - 1$?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>$x^{100} = (x^2-1)q(x) + ax + b$. As raízes do divisor são $1$ e $-1$.</p>
+          <p>$x = 1$: $1 = a + b$. $x = -1$: $1 = -a + b$. Logo $a = 0$, $b = 1$. Resto: $1$.</p>
+        </div></details>
+      </div>
+    </div>
+
+    <div class="check">
+      <input type="checkbox" id="ck-2" data-k="2">
+      <label for="ck-2"><strong>Checkpoint 2.</strong> Faço Briot-Ruffini sem esquecer zeros e acho restos por divisores de grau 1 e 2 sem dividir. Posso subir.</label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEGRAU 3 ============ -->
+<section class="step" id="degrau-3">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="eyebrow">Degrau 3 de 6</span>
+      <h2>Raízes e forma fatorada</h2>
+      <p class="goal">Meta: montar o polinômio a partir das raízes e caçar raízes inteiras e complexas.</p>
+    </div>
+
+    <div class="box ideia">
+      <span class="tag">Ideia central</span>
+      <ul>
+        <li><strong>Teorema Fundamental da Álgebra:</strong> todo polinômio de grau $n \geq 1$ tem exatamente $n$ raízes complexas (contando repetições) e pode ser escrito como
+          <div class="formula">$$p(x) = a_n(x - r_1)(x - r_2)\cdots(x - r_n).$$</div>
+          Conhecer as raízes e o coeficiente líder é conhecer o polinômio inteiro.</li>
+        <li><strong>Raízes conjugadas:</strong> se os coeficientes são <em>reais</em> e $z$ é raiz, então $\bar z$ também é. O par vira um fator real de grau 2:
+          <div class="formula">$$(x - z)(x - \bar z) = x^2 - 2\,\text{Re}(z)\,x + |z|^2.$$</div>
+          Exemplo que vai aparecer no topo: $z = 1 + i$ dá $x^2 - 2x + 2$.</li>
+        <li><strong>Raízes racionais:</strong> com coeficientes inteiros, uma raiz racional $\tfrac{p}{q}$ (fração irredutível) tem $p$ dividindo $a_0$ e $q$ dividindo $a_n$. Se o polinômio é <strong>mônico</strong>, toda raiz racional é <strong>inteira e divide o termo independente</strong>.</li>
+      </ul>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido</span>
+      <p>Resolva $x^3 - 6x^2 + 11x - 6 = 0$.</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p>Mônico, então as raízes racionais estão entre os divisores de $-6$: $\pm1, \pm2, \pm3, \pm6$.</p>
+          <p>Teste $x = 1$: $1 - 6 + 11 - 6 = 0$. ✓</p>
+          <p>Briot-Ruffini por $x - 1$ dá $x^2 - 5x + 6$, cujas raízes são $2$ e $3$.</p>
+          <p>Raízes: $1, 2, 3$. Forma fatorada: $(x-1)(x-2)(x-3)$.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box pegadinha">
+      <span class="tag">Pegadinha</span>
+      <p>A regra das conjugadas só vale com <strong>coeficientes reais</strong>. Leia o enunciado: “com coeficientes reais” é a senha para usar o par $z, \bar z$. Consequência útil: com coeficientes reais, grau ímpar garante pelo menos uma raiz real.</p>
+    </div>
+
+    <div class="treino">
+      <h3>Treino <span class="lvl">3 exercícios</span></h3>
+      <div class="ex">
+        <span class="num">3.1</span>
+        <p>Um polinômio mônico de grau 3 com coeficientes reais tem raízes $3$ e $i$. Determine $p(x)$ e $p(1)$.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Coeficientes reais, então $-i$ também é raiz. $(x - i)(x + i) = x^2 + 1$.</p>
+          <p>$p(x) = (x - 3)(x^2 + 1) = x^3 - 3x^2 + x - 3$ e $p(1) = (-2)(2) = -4$.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">3.2</span>
+        <p>Um polinômio de grau 4 com coeficientes reais pode ter exatamente três raízes reais distintas e uma raiz não real?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Não. Se $z$ não real é raiz, $\bar z$ também é. Seriam pelo menos $3 + 2 = 5$ raízes, mais que o grau permite.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">3.3</span>
+        <p>Resolva $x^3 - 5x^2 + 7x - 3 = 0$.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Candidatos: $\pm1, \pm3$. $p(1) = 1 - 5 + 7 - 3 = 0$.</p>
+          <p>Dividindo por $x - 1$: $x^2 - 4x + 3 = (x-1)(x-3)$.</p>
+          <p>Raízes: $1$ (dupla) e $3$. Forma fatorada: $(x-1)^2(x-3)$.</p>
+        </div></details>
+      </div>
+    </div>
+
+    <div class="check">
+      <input type="checkbox" id="ck-3" data-k="3">
+      <label for="ck-3"><strong>Checkpoint 3.</strong> Monto $p(x)$ a partir das raízes, uso o par conjugado para montar o fator de grau 2 e testo divisores do termo independente. Posso subir.</label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEGRAU 4 ============ -->
+<section class="step" id="degrau-4">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="eyebrow">Degrau 4 de 6</span>
+      <h2>Relações de Girard</h2>
+      <p class="goal">Meta: tirar informação das raízes direto dos coeficientes, sem resolver a equação.</p>
+    </div>
+
+    <div class="box ideia">
+      <span class="tag">Ideia central</span>
+      <p>Abra a forma fatorada e compare com os coeficientes. Para $ax^3 + bx^2 + cx + d$ com raízes $r, s, t$:</p>
+      <div class="formula">$$r + s + t = -\frac{b}{a}, \qquad rs + rt + st = \frac{c}{a}, \qquad rst = -\frac{d}{a}.$$</div>
+      <p>Regra para memorizar: os sinais <strong>alternam</strong>, começando com <strong>menos</strong>. Por isso, no grau $n$:</p>
+      <div class="formula">$$\text{produto das raízes} = (-1)^n \frac{a_0}{a_n}.$$</div>
+      <p>Grau par: o produto é $+\tfrac{a_0}{a_n}$. Grau ímpar: é $-\tfrac{a_0}{a_n}$.</p>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido</span>
+      <p>As raízes de $x^3 - 9x^2 + 23x - 15 = 0$ estão em progressão aritmética. Encontre-as.</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p>Chame as raízes de $m - d,\ m,\ m + d$. A soma é $3m = 9$, então $m = 3$.</p>
+          <p>Produto: $(3 - d)\cdot 3 \cdot (3 + d) = 15 \Rightarrow 9 - d^2 = 5 \Rightarrow d = 2$.</p>
+          <p>Raízes: $1, 3, 5$. Conferência com a 2ª relação: $3 + 5 + 15 = 23$. ✓</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box pegadinha">
+      <span class="tag">Pegadinha</span>
+      <p>Errar o sinal do produto. Em $x^4 + \dots - 21$ (grau 4, par), o produto das raízes é $-21$. Em $x^3 + \dots - 21$ (grau 3, ímpar), seria $+21$.</p>
+    </div>
+
+    <div class="treino">
+      <h3>Treino <span class="lvl">3 exercícios</span></h3>
+      <div class="ex">
+        <span class="num">4.1</span>
+        <p>Sejam $r, s, t$ as raízes de $x^3 - 5x^2 + 7x - 3$. Calcule $r^2 + s^2 + t^2$ e $\tfrac{1}{r} + \tfrac{1}{s} + \tfrac{1}{t}$.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Girard: $r + s + t = 5$, $rs + rt + st = 7$, $rst = 3$.</p>
+          <p>$r^2 + s^2 + t^2 = (r+s+t)^2 - 2(rs+rt+st) = 25 - 14 = 11$.</p>
+          <p>$\tfrac1r + \tfrac1s + \tfrac1t = \tfrac{rs + rt + st}{rst} = \tfrac{7}{3}$.</p>
+          <p>Conferência: as raízes são $1, 1, 3$ (exercício 3.3). $1 + 1 + 9 = 11$ ✓.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">4.2</span>
+        <p>O polinômio $x^2 + bx + 2$ tem duas raízes inteiras. Quais são os valores possíveis de $b$?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Produto das raízes $= 2$. Pares inteiros: $\{1, 2\}$ ou $\{-1, -2\}$.</p>
+          <p>Soma $= -b$: $3$ ou $-3$. Então $b = -3$ ou $b = 3$. (Guarde: volta no degrau 6.)</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">4.3</span>
+        <p>Um polinômio mônico de grau 4 tem quatro raízes inteiras e termo independente $-21$. Quais são os conjuntos possíveis dos <em>valores absolutos</em> das raízes? Quantas raízes negativas pode haver?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Grau par, então o produto é $-21$. Cada raiz divide 21, logo $|r_i| \in \{1, 3, 7, 21\}$ e o produto dos módulos é $21 = 3 \cdot 7$.</p>
+          <p>Conjuntos de módulos: $\{1, 1, 1, 21\}$ ou $\{1, 1, 3, 7\}$.</p>
+          <p>Como o produto é negativo, o número de raízes negativas é <strong>ímpar</strong>: 1 ou 3.</p>
+        </div></details>
+      </div>
+    </div>
+
+    <div class="check">
+      <input type="checkbox" id="ck-4" data-k="4">
+      <label for="ck-4"><strong>Checkpoint 4.</strong> Escrevo soma, soma dos produtos dois a dois e produto das raízes sem errar o sinal, inclusive no grau 4. Posso subir.</label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEGRAU 5 ============ -->
+<section class="step" id="degrau-5">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="eyebrow">Degrau 5 de 6</span>
+      <h2>O grau como ferramenta</h2>
+      <p class="goal">Meta: usar o grau para descobrir o polinômio, olhando só os termos que mandam.</p>
+    </div>
+
+    <div class="box ideia">
+      <span class="tag">Ideia central</span>
+      <p>Se $\text{grau}(p) = n$ com líder $a$ e $\text{grau}(q) = m$ com líder $b$:</p>
+      <ul>
+        <li>Produto: $\text{grau}(p\cdot q) = n + m$.</li>
+        <li>Composição: $\text{grau}(p(q(x))) = n \cdot m$, com coeficiente líder $a\cdot b^{\,n}$.</li>
+        <li>Soma ou diferença: $\text{grau}(p \pm q) \leq \max(n, m)$. Pode <strong>cair</strong> quando os termos líderes se cancelam. Esse cancelamento é uma informação valiosa.</li>
+      </ul>
+    </div>
+
+    <div class="box fisica">
+      <span class="tag">Conexão com a física</span>
+      <p>Para $t$ muito grande, em $s(t) = 5 + 20t - 5t^2$ quem manda é $-5t^2$. Estimar o comportamento olhando o termo dominante é o mesmo raciocínio: no grau de uma expressão, só o termo de maior expoente importa, a menos que ele se cancele.</p>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido 1</span>
+      <p>Encontre todos os polinômios $p$ tais que $p(p(x)) = 4x + 3$.</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p>Grau: $n \cdot n = 1$, então $n = 1$ e $p(x) = ax + b$.</p>
+          <p>$p(p(x)) = a(ax + b) + b = a^2x + ab + b$. Comparando: $a^2 = 4$ e $(a + 1)b = 3$.</p>
+          <p>$a = 2$: $3b = 3$, $b = 1$. $a = -2$: $-b = 3$, $b = -3$.</p>
+          <p>Duas respostas: $p(x) = 2x + 1$ ou $p(x) = -2x - 3$. Não perca a segunda.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido 2: o “mini-Q10”</span>
+      <p>Seja $p(x) = ax^2 + bx + c$, com $a \neq 0$. Para que $p(p(x)) - p(x^2)$ tenha grau <strong>menor</strong> que 4, quanto deve valer $a$? Nesse caso, qual é o grau se $b \neq 0$?</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p>Os dois termos têm grau 4. Líder de $p(p(x))$: $a\cdot a^2 = a^3$. Líder de $p(x^2)$: $a$.</p>
+          <p>Para o $x^4$ sumir: $a^3 = a \Rightarrow a^2 = 1 \Rightarrow a = \pm 1$.</p>
+          <p>Próximo termo, $x^3$: em $p(p(x)) = a\,[p(x)]^2 + b\,p(x) + c$, o $x^3$ vem de $a\cdot(2ab\,x^3) = 2a^2b\,x^3 = 2b\,x^3$. Já $p(x^2) = ax^4 + bx^2 + c$ não tem $x^3$.</p>
+          <p>Logo, se $b \neq 0$, o grau é <strong>3</strong>.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box pegadinha">
+      <span class="tag">Pegadinha</span>
+      <p>Achar que o grau de uma diferença é sempre o maior dos graus. Quando o enunciado diz “a diferença tem grau 8” e as parcelas parecem ter grau 9, ele está te contando que os termos líderes se cancelaram. Transforme isso em uma equação.</p>
+    </div>
+
+    <div class="treino">
+      <h3>Treino <span class="lvl">3 exercícios</span></h3>
+      <div class="ex">
+        <span class="num">5.1</span>
+        <p>Se $\text{grau}(p) = 3$ e $\text{grau}(q) = 2$, qual o grau de $p\cdot q$, $p(q(x))$, $q(p(x))$ e $p + q$?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>$5$, $6$, $6$ e $3$.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">5.2</span>
+        <p>Encontre todos os polinômios $p$ tais que $p(p(x)) = 9x - 8$.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>$p(x) = ax + b$ com $a^2 = 9$ e $(a + 1)b = -8$.</p>
+          <p>$a = 3$: $4b = -8$, $b = -2$. $a = -3$: $-2b = -8$, $b = 4$.</p>
+          <p>$p(x) = 3x - 2$ ou $p(x) = -3x + 4$.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">5.3</span>
+        <p>Existe polinômio $p$ tal que $p(p(x)) = x^2 + 1$?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Não. Precisaríamos de $n^2 = 2$, que não tem solução inteira.</p>
+        </div></details>
+      </div>
+    </div>
+
+    <div class="check">
+      <input type="checkbox" id="ck-5" data-k="5">
+      <label for="ck-5"><strong>Checkpoint 5.</strong> Calculo o grau e o coeficiente líder de uma composição e transformo “o grau caiu” em uma equação. Posso subir.</label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEGRAU 6 ============ -->
+<section class="step" id="degrau-6">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="eyebrow">Degrau 6 de 6</span>
+      <h2>Polinômios e números inteiros</h2>
+      <p class="goal">Meta: trocar “para todo inteiro $n$” por poucos casos, usando restos.</p>
+    </div>
+
+    <div class="box ideia">
+      <span class="tag">Ideia central</span>
+      <ul>
+        <li><strong>Relógio de $m$ horas:</strong> na divisão por $m$, só o resto importa. Se $n$ e $n'$ deixam o mesmo resto por $m$, então $p(n)$ e $p(n')$ também deixam (coeficientes inteiros). Para checar “todo inteiro $n$”, basta checar os restos $0, 1, \dots, m-1$.</li>
+        <li><strong>Diferenças:</strong> com coeficientes inteiros, $(a - b)$ divide $p(a) - p(b)$.</li>
+        <li><strong>A chave do topo:</strong> se $p(x) = (x - r_1)(x - r_2)\cdots(x - r_k)$ com $r_i$ inteiros e <strong>$m$ é primo</strong>, então
+          <div class="formula">$$m \mid p(n) \iff n \text{ deixa o mesmo resto que alguma raiz } r_i \text{ na divisão por } m.$$</div>
+          Motivo: um primo que divide um produto divide algum dos fatores $(n - r_i)$.</li>
+      </ul>
+    </div>
+
+    <div class="box exemplo">
+      <span class="tag">Exemplo resolvido</span>
+      <p>Para quais inteiros $n$ o número $n^2 - 3n + 2$ é múltiplo de 5?</p>
+      <details>
+        <summary>Ver solução</summary>
+        <div class="ans">
+          <p>Fatore: $n^2 - 3n + 2 = (n-1)(n-2)$. Como 5 é primo, 5 divide o produto só se dividir $n - 1$ ou $n - 2$.</p>
+          <p>Resposta: $n$ deixa resto 1 ou 2 na divisão por 5 ($n = 1, 2, 6, 7, 11, 12, \dots$).</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="box pegadinha">
+      <span class="tag">Pegadinha</span>
+      <p>A chave só funciona para <strong>primo</strong>. $6$ divide $2 \cdot 3$, mas não divide 2 nem 3. Se o divisor for composto, a análise é outra.</p>
+    </div>
+
+    <div class="treino">
+      <h3>Treino <span class="lvl">3 exercícios</span></h3>
+      <div class="ex">
+        <span class="num">6.1</span>
+        <p>Existe polinômio com coeficientes inteiros tal que $p(1) = 2$ e $p(3) = 5$?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Não. $3 - 1 = 2$ deveria dividir $p(3) - p(1) = 3$, e 2 não divide 3.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">6.2</span>
+        <p>Por que $n^3 - n$ é múltiplo de 3 para todo inteiro $n$?</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>$n^3 - n = (n - 0)(n - 1)(n + 1)$. As raízes $0, 1, -1$ deixam restos $0, 1, 2$ na divisão por 3: cobrem <em>todos</em> os restos. Qualquer $n$ “bate” com alguma raiz, então 3 divide o produto.</p>
+        </div></details>
+      </div>
+      <div class="ex">
+        <span class="num">6.3 · mini-Q12</span>
+        <p>Seja $p(x) = x^2 + bx + 2$, com duas raízes inteiras, tal que $p(n)$ é múltiplo de 3 para todo inteiro $n$ que não é múltiplo de 3. Determine $b$.</p>
+        <details><summary>Ver resposta</summary><div class="ans">
+          <p>Pela chave (3 é primo), os restos 1 e 2 precisam ser restos de raízes. Duas raízes, dois restos: uma raiz deixa resto 1 e a outra resto 2.</p>
+          <p>Do exercício 4.2, as raízes são $\{1, 2\}$ ou $\{-1, -2\}$.</p>
+          <p>$\{1, 2\}$: restos 1 e 2 ✓. $\{-1, -2\}$: $-1$ deixa resto 2 e $-2$ deixa resto 1 ✓.</p>
+          <p>Logo $b = -3$ ou $b = 3$ (e $b^2 = 9$ nos dois casos). Guarde essa estrutura: a Q12 é exatamente isso, com grau 4 e o primo 5.</p>
+        </div></details>
+      </div>
+    </div>
+
+    <div class="check">
+      <input type="checkbox" id="ck-6" data-k="6">
+      <label for="ck-6"><strong>Checkpoint 6.</strong> Troco “para todo $n$” por uma análise de restos e uso a chave do primo num produto de fatores $(n - r_i)$. Posso ir para o topo.</label>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOPO ============ -->
+<section class="topo" id="topo">
+  <div class="wrap">
+    <div class="step-head">
+      <span class="eyebrow">Topo da escada · ITA 2027 · 1ª fase</span>
+      <h2>As duas questões de polinômios</h2>
+      <p class="goal">Tente cada questão por 10 minutos antes de abrir as dicas. Abra uma dica por vez.</p>
+    </div>
+
+    <!-- Q10 -->
+    <article class="questao" aria-labelledby="q10-t">
+      <h3 id="q10-t">Questão 10</h3>
+      <p class="enun">Seja $p(x)$ um polinômio com coeficientes reais tal que $p(1+i) = 0$ e $p(1) = -1$. Sabendo que $p(p(x)) - p(x^3)$ é um polinômio de grau 8, o valor de $p(-1)$ é</p>
+      <div class="alts"><span>A) $-50$</span><span>B) $-5$</span><span>C) $-1$</span><span>D) $-3$</span><span>E) $-15$</span></div>
+      <div class="tools">
+        <a class="chip" href="#degrau-1">Degrau 1 · valor numérico</a>
+        <a class="chip" href="#degrau-3">Degrau 3 · conjugadas</a>
+        <a class="chip" href="#degrau-5">Degrau 5 · grau da composição</a>
+      </div>
+      <details><summary>Dica 1</summary><div class="ans">
+        <p>“Coeficientes reais” e “$1 + i$ é raiz”. Que outra raiz você ganha de graça? Que fator de grau 2 isso dá?</p>
+      </div></details>
+      <details><summary>Dica 2</summary><div class="ans">
+        <p>Chame de $n$ o grau de $p$. Qual o grau de $p(p(x))$? E de $p(x^3)$? Para quais $n$ a diferença <em>pode</em> ter grau 8?</p>
+      </div></details>
+      <details><summary>Dica 3</summary><div class="ans">
+        <p>Com $n = 3$ os dois termos têm grau 9. Para sobrar grau 8, os $x^9$ precisam se cancelar. Se $a$ é o coeficiente líder, isso dá uma equação em $a$.</p>
+      </div></details>
+      <details><summary>Solução completa</summary><div class="ans">
+        <ol class="steps">
+          <li><strong>Raízes conjugadas.</strong> Coeficientes reais, então $1 - i$ também é raiz e $(x - 1 - i)(x - 1 + i) = x^2 - 2x + 2$ divide $p$. Logo $n \geq 2$.</li>
+          <li><strong>Detector de grau.</strong> $\text{grau}\,p(p(x)) = n^2$ e $\text{grau}\,p(x^3) = 3n$.
+            <ul>
+              <li>$n = 2$: graus 4 e 6, a diferença tem grau 6.</li>
+              <li>$n \geq 4$: $n^2 \gt 3n$, a diferença tem grau $n^2 \geq 16$.</li>
+              <li>$n = 3$: os dois têm grau 9. Único caso em que o grau pode cair para 8.</li>
+            </ul>
+          </li>
+          <li><strong>Cancelamento do líder.</strong> Com líder $a$: o $x^9$ de $p(p(x))$ tem coeficiente $a\cdot a^3 = a^4$, e o de $p(x^3)$ tem $a$. Precisa $a^4 = a$, com $a$ real e $a \neq 0$: $a^3 = 1$, logo $a = 1$.</li>
+          <li><strong>Montar $p$.</strong> $p(x) = (x^2 - 2x + 2)(x - r)$. Use $p(1) = -1$: $(1 - 2 + 2)(1 - r) = 1 - r = -1$, então $r = 2$.
+            <div class="formula">$$p(x) = (x^2 - 2x + 2)(x - 2) = x^3 - 4x^2 + 6x - 4.$$</div></li>
+          <li><strong>Conferir o grau 8.</strong> O $x^8$ de $p(p(x))$ vem de $[p(x)]^3 = (x^3 - 4x^2 + \dots)^3$: coeficiente $3\cdot(-4) = -12 \neq 0$. E $p(x^3)$ só tem potências múltiplas de 3, sem $x^8$. Grau 8 confirmado ✓.</li>
+          <li><strong>Resposta.</strong> $p(-1) = (1 + 2 + 2)(-1 - 2) = 5 \cdot (-3) = -15$. <span class="answer-pill">Alternativa E</span></li>
+        </ol>
+        <p class="licao"><strong>Lição:</strong> o grau é um detector. “Grau 8” onde se esperava grau 9 diz que os líderes se cancelaram, e isso determina o coeficiente líder.</p>
+      </div></details>
+      <div class="check">
+        <input type="checkbox" id="ck-q10" data-k="q10">
+        <label for="ck-q10"><strong>Q10 dominada.</strong> Resolvi usando no máximo uma dica.</label>
+      </div>
+    </article>
+
+    <!-- Q12 -->
+    <article class="questao" aria-labelledby="q12-t">
+      <h3 id="q12-t">Questão 12</h3>
+      <p class="enun">Considere um polinômio dado por $p(x) = x^4 + ax^3 + bx^2 + cx - 21$, em que $a$, $b$ e $c$ são números reais. Sabe-se que $p(x)$ possui quatro raízes inteiras e que, para todo inteiro $n$ que não seja múltiplo de 5, o valor de $p(n)$ é múltiplo de 5. Determine o valor de $a^2 + b^2 + c^2$.</p>
+      <div class="alts"><span>A) $375$</span><span>B) $600$</span><span>C) $1368$</span><span>D) $1624$</span><span>E) $2025$</span></div>
+      <div class="tools">
+        <a class="chip" href="#degrau-3">Degrau 3 · forma fatorada</a>
+        <a class="chip" href="#degrau-4">Degrau 4 · produto das raízes</a>
+        <a class="chip" href="#degrau-6">Degrau 6 · restos e primos</a>
+      </div>
+      <details><summary>Dica 1</summary><div class="ans">
+        <p>Escreva $p(x) = (x - r_1)(x - r_2)(x - r_3)(x - r_4)$. Pelo Girard (grau 4, par), quanto vale <span style="white-space: nowrap">$r_1 r_2 r_3 r_4$?</span> Que números inteiros podem ser raízes?</p>
+      </div></details>
+      <details><summary>Dica 2</summary><div class="ans">
+        <p>5 é primo. $p(n) = (n - r_1)(n - r_2)(n - r_3)(n - r_4)$ é múltiplo de 5 exatamente quando $n$ deixa o mesmo resto que alguma raiz. O enunciado exige isso para $n$ com resto 1, 2, 3 e 4.</p>
+      </div></details>
+      <details><summary>Dica 3</summary><div class="ans">
+        <p>Quatro raízes, quatro restos (1, 2, 3, 4): cada raiz cobre exatamente um resto. Faça uma tabela dos divisores de 21 com seus restos na divisão por 5.</p>
+      </div></details>
+      <details><summary>Solução completa</summary><div class="ans">
+        <ol class="steps">
+          <li><strong>Produto das raízes.</strong> Grau 4 (par): $r_1 r_2 r_3 r_4 = -21$. Cada raiz divide 21: $r_i \in \{\pm1, \pm3, \pm7, \pm21\}$.</li>
+          <li><strong>Condição dos restos.</strong> Para $n$ com resto $k \in \{1,2,3,4\}$, 5 divide $p(n)$, então alguma raiz tem resto $k$. São 4 raízes para cobrir 4 restos: as raízes têm restos <strong>1, 2, 3 e 4</strong>, uma de cada.</li>
+          <li><strong>Tabela de restos por 5</strong> (resto entre 0 e 4):
+            <div class="scroll">
+              <table class="res">
+                <tr><th>raiz</th><td>1</td><td>−1</td><td>3</td><td>−3</td><td>7</td><td>−7</td><td>21</td><td>−21</td></tr>
+                <tr><th>resto</th><td>1</td><td>4</td><td>3</td><td>2</td><td>2</td><td>3</td><td>1</td><td>4</td></tr>
+              </table>
+            </div>
+          </li>
+          <li><strong>Eliminar casos.</strong> Os módulos das raízes formam $\{1,1,1,21\}$ ou $\{1,1,3,7\}$.
+            <ul>
+              <li>$\{1,1,1,21\}$: só produz restos 1 e 4. Nunca cobre 2 e 3. ✗</li>
+              <li>$\{1,1,3,7\}$: os dois “1” precisam dar restos 1 e 4, então são $1$ e $-1$. O $3$ e o $7$ precisam dar restos 2 e 3: $(3, 7)$ dá 3 e 2 ✓; $(-3,-7)$ dá 2 e 3 ✓; $(3, -7)$ dá 3 e 3 ✗; $(-3, 7)$ dá 2 e 2 ✗.</li>
+            </ul>
+            Os dois casos válidos têm produto $-21$ ✓.</li>
+          <li><strong>Montar $p$.</strong> Raízes $1, -1, 3, 7$:
+            <div class="formula">$$p(x) = (x^2 - 1)(x^2 - 10x + 21) = x^4 - 10x^3 + 20x^2 + 10x - 21.$$</div>
+            Então $a = -10$, $b = 20$, $c = 10$. Com raízes $1, -1, -3, -7$ obtemos $a = 10$, $b = 20$, $c = -10$: mesmos quadrados.</li>
+          <li><strong>Resposta.</strong> $a^2 + b^2 + c^2 = 100 + 400 + 100 = 600$. <span class="answer-pill">Alternativa B</span></li>
+        </ol>
+        <p class="licao"><strong>Lição:</strong> uma condição “para todo inteiro $n$” virou uma condição sobre 4 restos. Com um primo e a forma fatorada, o infinito vira uma tabela.</p>
+      </div></details>
+      <div class="check">
+        <input type="checkbox" id="ck-q12" data-k="q12">
+        <label for="ck-q12"><strong>Q12 dominada.</strong> Resolvi usando no máximo uma dica.</label>
+      </div>
+    </article>
+  </div>
+</section>
+
+</main>
+
+<footer class="prof">
+  <div class="wrap">
+    <span class="eyebrow">Para o professor</span>
+    <h2>Roteiro sugerido</h2>
+    <p>Comece com um <strong>pré-teste de 10 minutos</strong>: entregue a Q10 e a Q12 sem nenhuma explicação. A maioria trava, e isso dá motivo para subir a escada. No fim, reaplique as mesmas questões e compare.</p>
+    <div class="plan">
+      <div><span class="eyebrow">Encontro 1 · 100 min</span><p>Pré-teste, degraus 1 e 2. Treino em duplas; cada dupla explica um exercício na lousa.</p></div>
+      <div><span class="eyebrow">Encontro 2 · 100 min</span><p>Degraus 3 e 4. Fechar com o exercício 4.3, que antecipa a Q12.</p></div>
+      <div><span class="eyebrow">Encontro 3 · 100 min</span><p>Degraus 5 e 6 (os “mini” 5.2 e 6.3) e o topo: Q10 e Q12 com dicas liberadas uma a uma.</p></div>
+    </div>
+    <p class="muted">Diagnóstico rápido: aluno que erra a Q10 quase sempre parou no degrau 5 (cancelamento de líder). Quem erra a Q12 costuma ter parado no 4 (sinal do produto) ou no 6 (chave do primo). O botão “Abrir todas as respostas” serve para projetar as soluções em sala. O progresso dos checkpoints fica salvo só no navegador de cada aluno.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var KEY = 'escada-polinomios-v1';
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  function render() {
+    var keys = ['1', '2', '3', '4', '5', '6'];
+    var count = 0;
+    keys.forEach(function (k) {
+      var done = !!state[k];
+      if (done) count++;
+      var r = document.querySelector('.rung[data-k="' + k + '"]');
+      if (r) r.classList.toggle('done', done);
+    });
+    var topDone = !!state.q10 && !!state.q12;
+    if (topDone) count++;
+    var t = document.querySelector('.rung[data-k="topo"]');
+    if (t) t.classList.toggle('done', topDone);
+    var p = document.getElementById('progress');
+    if (p) p.textContent = count + ' de 7 degraus concluídos';
+  }
+
+  document.querySelectorAll('.check input[type="checkbox"]').forEach(function (cb) {
+    var k = cb.getAttribute('data-k');
+    cb.checked = !!state[k];
+    cb.addEventListener('change', function () { state[k] = cb.checked; save(); render(); });
+  });
+
+  var allOpen = false;
+  var btn = document.getElementById('toggle-all');
+  btn.addEventListener('click', function () {
+    allOpen = !allOpen;
+    document.querySelectorAll('main details').forEach(function (d) { d.open = allOpen; });
+    btn.textContent = allOpen ? 'Fechar todas as respostas' : 'Abrir todas as respostas';
+  });
+
+  document.getElementById('reset').addEventListener('click', function () {
+    state = {}; save();
+    document.querySelectorAll('.check input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
+    render();
+  });
+
+  render();
+})();
+</script>
